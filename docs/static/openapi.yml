@@ -25848,11 +25848,6 @@ definitions:
     description: >-
       MsgCreateVestingAccountResponse defines the Msg/CreateVestingAccount
       response type.
-  dsorm.cosmostaskone.cosmostaskone.MsgMsgAddTokensLockResponse:
-    type: object
-    properties:
-      id:
-        type: string
   ibc.applications.transfer.v1.DenomTrace:
     type: object
     properties:
