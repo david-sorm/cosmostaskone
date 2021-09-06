@@ -1,0 +1,12 @@
+syntax = "proto3";
+package dsorm.cosmostaskone.cosmostaskone;
+
+// this line is used by starport scaffolding # genesis/proto/import
+
+option go_package = "github.com/dsorm/cosmostaskone/x/cosmostaskone/types";
+
+// GenesisState defines the cosmostaskone module's genesis state.
+message GenesisState {
+    // this line is used by starport scaffolding # genesis/proto/state
+    // this line is used by starport scaffolding # ibc/genesis/proto
+}
