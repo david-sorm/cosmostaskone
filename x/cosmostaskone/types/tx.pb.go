@@ -32,6 +32,7 @@ type MsgAddTokensLock struct {
 	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	Amount  string `protobuf:"bytes,2,opt,name=amount,proto3" json:"amount,omitempty"`
 	Denom   string `protobuf:"bytes,3,opt,name=denom,proto3" json:"denom,omitempty"`
+	// TODO smazat a vyuzit creator
 	Address string `protobuf:"bytes,4,opt,name=address,proto3" json:"address,omitempty"`
 }
 
