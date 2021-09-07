@@ -1,18 +1,17 @@
 package types
 
 import (
+	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 var _ sdk.Msg = &MsgAddTokensLock{}
 
-func NewMsgAddTokensLock(creator string, amount string, denom string, address string) *MsgAddTokensLock {
+func NewMsgAddTokensLock(creator string, balances []*cosmosTypes.Coin) *MsgAddTokensLock {
 	return &MsgAddTokensLock{
-		Creator: creator,
-		Amount:  amount,
-		Denom:   denom,
-		Address: address,
+		Creator:  creator,
+		Balances: balances,
 	}
 }
 
