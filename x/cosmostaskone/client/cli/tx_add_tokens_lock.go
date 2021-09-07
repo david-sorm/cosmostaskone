@@ -47,20 +47,28 @@ func (cr coinsRaw) ParseCoins() ([]*cosmosTypes.Coin, error) {
 
 func CmdAddTokensLock() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "add-tokens-lock [amount] [denom] [address]",
+		Use:   "add-tokens-lock \"[{\\\"amount\\\":\\\"2000\\\", \\\"denom\\\":\\\"doge\\\"}, {\\\"amount\\\":\\\"2\\\", \\\"denom\\\":\\\"btc\\\"},... ]\"",
 		Short: "Broadcast message AddTokensLock",
-		Args:  cobra.ExactArgs(3),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			argsAmount := string(args[0])
-			argsDenom := string(args[1])
-			argsAddress := string(args[2])
+			argsAmountDenom := args[0]
+			var coinsArg coinsRaw
+			err := json.Unmarshal([]byte(argsAmountDenom), &coinsArg)
+			if err != nil {
+				return errors.New("error while unmarshaling coins: " + err.Error())
+			}
+
+			coins, err := coinsArg.ParseCoins()
+			if err != nil {
+				return errors.New("error while unmarshaling coins: " + err.Error())
+			}
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgAddTokensLock(clientCtx.GetFromAddress().String(), string(argsAmount), string(argsDenom), string(argsAddress))
+			msg := types.NewMsgAddTokensLock(clientCtx.GetFromAddress().String(), coins)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
