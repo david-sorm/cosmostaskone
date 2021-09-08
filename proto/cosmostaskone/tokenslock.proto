@@ -1,0 +1,10 @@
+syntax = "proto3";
+package dsorm.cosmostaskone.cosmostaskone;
+import "cosmos/base/v1beta1/coin.proto";
+
+option go_package = "github.com/dsorm/cosmostaskone/x/cosmostaskone/types";
+
+//message TokensLock {
+//  string creator = 1;
+//  repeated cosmos.base.v1beta1.Coin balances = 2;
+//}
