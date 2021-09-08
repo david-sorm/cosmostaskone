@@ -3,6 +3,8 @@ package dsorm.cosmostaskone.cosmostaskone;
 
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
+import "cosmos/base/v1beta1/coin.proto";
+
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/dsorm/cosmostaskone/x/cosmostaskone/types";
@@ -10,6 +12,24 @@ option go_package = "github.com/dsorm/cosmostaskone/x/cosmostaskone/types";
 // Query defines the gRPC querier service.
 service Query {
     // this line is used by starport scaffolding # 2
+
+	// Queries a list of listAllTokenLocks items.
+	rpc ListAllTokenLocks(QueryListAllTokenLocksRequest) returns (QueryListAllTokenLocksResponse) {
+		option (google.api.http).get = "/dsorm/cosmostaskone/cosmostaskone/listAllTokenLocks";
+	}
+
 }
 
 // this line is used by starport scaffolding # 3
+message QueryListAllTokenLocksRequest {
+}
+
+// TODO figure out how to import this from tokenslock.proto
+message TokensLock {
+	string creator = 1;
+	repeated cosmos.base.v1beta1.Coin balances = 2;
+}
+
+message QueryListAllTokenLocksResponse {
+	repeated TokensLock TokensLockList = 1;
+}
