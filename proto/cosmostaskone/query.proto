@@ -24,10 +24,10 @@ service Query {
 message QueryListAllTokenLocksRequest {
 }
 
-// TODO figure out how to import this from tokenslock.proto
 message TokensLock {
-	string creator = 1;
-	repeated cosmos.base.v1beta1.Coin balances = 2;
+	string id = 1;
+	string creator = 2;
+	repeated cosmos.base.v1beta1.Coin balances = 3;
 }
 
 message QueryListAllTokenLocksResponse {

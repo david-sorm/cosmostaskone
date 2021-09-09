@@ -10374,6 +10374,8 @@ paths:
                 items:
                   type: object
                   properties:
+                    id:
+                      type: string
                     creator:
                       type: string
                     balances:
@@ -10394,7 +10396,6 @@ paths:
                           custom method
 
                           signatures required by gogoproto.
-                  title: TODO figure out how to import this from tokenslock.proto
         default:
           description: An unexpected error response.
           schema:
@@ -25474,6 +25475,8 @@ definitions:
         items:
           type: object
           properties:
+            id:
+              type: string
             creator:
               type: string
             balances:
@@ -25493,10 +25496,11 @@ definitions:
                   method
 
                   signatures required by gogoproto.
-          title: TODO figure out how to import this from tokenslock.proto
   dsorm.cosmostaskone.cosmostaskone.TokensLock:
     type: object
     properties:
+      id:
+        type: string
       creator:
         type: string
       balances:
@@ -25513,7 +25517,6 @@ definitions:
 
             NOTE: The amount field is an Int which implements the custom method
             signatures required by gogoproto.
-    title: TODO figure out how to import this from tokenslock.proto
   ibc.applications.transfer.v1.DenomTrace:
     type: object
     properties:
