@@ -11,6 +11,25 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+func (k Keeper) GetTokensLockCount(ctx sdk.Context) uint64 {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(keyPrefix))
+	byteKey := types.KeyPrefix("Count")
+	result := store.Get(byteKey)
+
+	// no result, no element
+	if result == nil {
+		return 0
+	}
+
+	// bytes -> uint64
+	count, err := strconv.ParseUint(string(result), 10, 64)
+	if err != nil {
+		panic("err while converting bytes to uint64")
+	}
+
+	return count
+}
+
 func (k Keeper) ListAllTokenLocks(goCtx context.Context, req *types.QueryListAllTokenLocksRequest) (*types.QueryListAllTokenLocksResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
@@ -21,19 +40,19 @@ func (k Keeper) ListAllTokenLocks(goCtx context.Context, req *types.QueryListAll
 	// create new store from sdk context
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(keyPrefix))
 
-	var msgK msgServer
-	tokenLockCount := msgK.GetTokensLockCount(ctx)
+	tokenLockCount := k.GetTokensLockCount(ctx)
 
 	tokensLockList := make([]*types.TokensLock, 0, tokenLockCount)
 
-	msg := types.MsgAddTokensLock{}
+	var msg types.MsgAddTokensLock
 	for i := uint64(1); i <= tokenLockCount; i++ {
 		key := keyPrefix + strconv.FormatUint(i, 10)
 		bz := store.Get([]byte(key))
 
-		// TODO use TokensLock from tokenslock.proto
+		msg = types.MsgAddTokensLock{}
 		k.cdc.MustUnmarshalBinaryBare(bz, &msg)
 		tokensLockList = append(tokensLockList, &types.TokensLock{
+			Id:       strconv.FormatUint(i, 10),
 			Creator:  msg.Creator,
 			Balances: msg.Balances,
 		})

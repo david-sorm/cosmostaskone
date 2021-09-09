@@ -11,25 +11,6 @@ import (
 
 const keyPrefix = "TokenLock-"
 
-func (k msgServer) GetTokensLockCount(ctx sdk.Context) uint64 {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(keyPrefix))
-	byteKey := types.KeyPrefix("Count")
-	result := store.Get(byteKey)
-
-	// no result, no element
-	if result == nil {
-		return 0
-	}
-
-	// bytes -> uint64
-	count, err := strconv.ParseUint(string(result), 10, 64)
-	if err != nil {
-		panic("err while converting bytes to uint64")
-	}
-
-	return count
-}
-
 func (k msgServer) SetTokensLockCount(ctx sdk.Context, count uint64) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte(keyPrefix))
 	byteKey := types.KeyPrefix("Count")
