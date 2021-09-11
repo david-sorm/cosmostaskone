@@ -7,15 +7,19 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	bank "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	"github.com/dsorm/cosmostaskone/x/cosmostaskone/types"
 	// this line is used by starport scaffolding # ibc/keeper/import
 )
 
 type (
 	Keeper struct {
-		cdc      codec.Marshaler
-		storeKey sdk.StoreKey
-		memKey   sdk.StoreKey
+		cdc        codec.Marshaler
+		storeKey   sdk.StoreKey
+		memKey     sdk.StoreKey
+		bankKeeper bank.Keeper
+
+		//bankKeeper types.BankKeeper
 		// this line is used by starport scaffolding # ibc/keeper/attribute
 
 	}
@@ -25,13 +29,15 @@ func NewKeeper(
 	cdc codec.Marshaler,
 	storeKey,
 	memKey sdk.StoreKey,
+	bk bank.Keeper,
 	// this line is used by starport scaffolding # ibc/keeper/parameter
 
 ) *Keeper {
 	return &Keeper{
-		cdc:      cdc,
-		storeKey: storeKey,
-		memKey:   memKey,
+		cdc:        cdc,
+		storeKey:   storeKey,
+		memKey:     memKey,
+		bankKeeper: bk,
 		// this line is used by starport scaffolding # ibc/keeper/return
 
 	}

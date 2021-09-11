@@ -342,6 +342,7 @@ func New(
 		appCodec,
 		keys[cosmostaskonemoduletypes.StoreKey],
 		keys[cosmostaskonemoduletypes.MemStoreKey],
+		app.BankKeeper,
 	)
 	cosmostaskoneModule := cosmostaskonemodule.NewAppModule(appCodec, app.CosmostaskoneKeeper)
 
