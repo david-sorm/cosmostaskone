@@ -13,7 +13,7 @@ func WithPrefix(str string) []byte {
 	return []byte(keyPrefix + str)
 }
 
-// returns the StartNode, a node used as a starting point for the linked list
+// TokenLockStartNode returns the StartNode, a node used as a starting point for the linked list
 // if the StartNode doesn't exist, it gets created automatically
 func TokenLockStartNode(store prefix.Store, cdc codec.Marshaler) TokenLockInternal {
 	var tli TokenLockInternal
@@ -29,7 +29,7 @@ func TokenLockStartNode(store prefix.Store, cdc codec.Marshaler) TokenLockIntern
 	return tli
 }
 
-// returns the last available TokenLock node
+// Last returns the last available TokenLock node
 func (tl TokenLockInternal) Last(store prefix.Store, cdc codec.Marshaler) TokenLockInternal {
 	for len(tl.NextNode) != 0 {
 		tl = tl.Next(store, cdc)
@@ -37,7 +37,7 @@ func (tl TokenLockInternal) Last(store prefix.Store, cdc codec.Marshaler) TokenL
 	return tl
 }
 
-// returns the following node after this node
+// Next returns the following node after this node
 func (tl TokenLockInternal) Next(store prefix.Store, cdc codec.Marshaler) TokenLockInternal {
 	if len(tl.NextNode) == 0 {
 		return tl
@@ -47,7 +47,7 @@ func (tl TokenLockInternal) Next(store prefix.Store, cdc codec.Marshaler) TokenL
 	return tl
 }
 
-// generates a unique id for a tokenlock and ensures it is actually not used already
+// GenerateUniqueID generates a unique id for a tokenlock and ensures it is actually not used already
 func (tl *TokenLockInternal) GenerateUniqueID(store prefix.Store) {
 	hash := ""
 
@@ -69,7 +69,7 @@ func (tl *TokenLockInternal) GenerateUniqueID(store prefix.Store) {
 	tl.ID = hash
 }
 
-// saves the updated TokenLock node to the DB automatically according to it's ID
+// Save saves the updated TokenLock node to the DB automatically according to it's ID
 func (tl TokenLockInternal) Save(store prefix.Store, cdc codec.Marshaler) {
 	if len(tl.ID) == 0 {
 		panic("no ID specified!")
@@ -80,7 +80,7 @@ func (tl TokenLockInternal) Save(store prefix.Store, cdc codec.Marshaler) {
 	store.Set(WithPrefix(tl.ID), bz)
 }
 
-// fetches a tokenlock from the db by the id
+// TokenLockLoad fetches a tokenlock from the db by the id
 func TokenLockLoad(store prefix.Store, cdc codec.Marshaler, id string) TokenLockInternal {
 	tl := TokenLockInternal{}
 	bz := store.Get(WithPrefix(id))
