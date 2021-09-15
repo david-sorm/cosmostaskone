@@ -25467,6 +25467,8 @@ definitions:
     properties:
       id:
         type: string
+  dsorm.cosmostaskone.cosmostaskone.MsgRemoveTokenLockResponse:
+    type: object
   dsorm.cosmostaskone.cosmostaskone.QueryListAllTokenLocksResponse:
     type: object
     properties:

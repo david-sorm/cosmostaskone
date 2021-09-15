@@ -9,10 +9,19 @@ option go_package = "github.com/dsorm/cosmostaskone/x/cosmostaskone/types";
 // Msg defines the Msg service.
 service Msg {
     // this line is used by starport scaffolding # proto/tx/rpc
+  rpc RemoveTokenLock(MsgRemoveTokenLock) returns (MsgRemoveTokenLockResponse);
   rpc AddTokensLock(MsgAddTokensLock) returns (MsgAddTokensLockResponse);
 }
 
 // this line is used by starport scaffolding # proto/tx/message
+message MsgRemoveTokenLock {
+  string creator = 1;
+  string id = 2;
+}
+
+message MsgRemoveTokenLockResponse {
+}
+
 message MsgAddTokensLock {
   string creator = 1;
   repeated cosmos.base.v1beta1.Coin balances = 2;
