@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	bank "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -19,6 +20,9 @@ func setupKeeper(t testing.TB) (*Keeper, sdk.Context) {
 	storeKey := sdk.NewKVStoreKey(types.StoreKey)
 	memStoreKey := storetypes.NewMemoryStoreKey(types.MemStoreKey)
 
+	// TODO just a placeholder, if we were actually using testing, this would break
+	bankKeeper := bank.BaseKeeper{}
+
 	db := tmdb.NewMemDB()
 	stateStore := store.NewCommitMultiStore(db)
 	stateStore.MountStoreWithDB(storeKey, sdk.StoreTypeIAVL, db)
@@ -30,6 +34,7 @@ func setupKeeper(t testing.TB) (*Keeper, sdk.Context) {
 		codec.NewProtoCodec(registry),
 		storeKey,
 		memStoreKey,
+		bankKeeper,
 	)
 
 	ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())
