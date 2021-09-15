@@ -23,4 +23,8 @@ message TokenLockInternal {
   // key of the next TokenLock (ID excluding prefix)
   // if len() == 0, there is no next TokenLock; this is the last one
   string NextNode = 4;
+
+  // by default false
+  // only true if the token lock has been disabled by RemoveTokenLock
+  bool disabled = 5;
 }

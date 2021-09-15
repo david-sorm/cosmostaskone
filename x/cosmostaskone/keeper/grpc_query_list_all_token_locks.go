@@ -22,6 +22,9 @@ func (k Keeper) ListAllTokenLocks(goCtx context.Context, req *types.QueryListAll
 	tokensLockList := make([]*types.TokensLock, 0, 16)
 
 	for tokenLock := types.TokenLockStartNode(store, k.cdc); len(tokenLock.NextNode) != 0; tokenLock.Next(store, k.cdc) {
+		if tokenLock.Disabled {
+			continue
+		}
 		tokensLockList = append(tokensLockList, &types.TokensLock{
 			Id:       tokenLock.ID,
 			Creator:  tokenLock.Creator,
