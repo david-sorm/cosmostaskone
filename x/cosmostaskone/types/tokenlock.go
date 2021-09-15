@@ -18,7 +18,9 @@ func WithPrefix(str string) []byte {
 func TokenLockStartNode(store prefix.Store, cdc codec.Marshaler) TokenLockInternal {
 	var tli TokenLockInternal
 
+	// if there is no startnode yet, create a new one
 	if !store.Has(WithPrefix("StartNode")) {
+		tli.ID = "StartNode"
 		bz := cdc.MustMarshalBinaryBare(&tli)
 		store.Set(WithPrefix("StartNode"), bz)
 		return tli
