@@ -32,6 +32,8 @@ func (k msgServer) AddTokensLock(goCtx context.Context, msg *types.MsgAddTokensL
 		}
 	}
 
+	// TODO steal the tokens
+
 	lastNode := types.TokenLockStartNode(store, k.cdc).Last(store, k.cdc)
 
 	currentNode := types.TokenLockInternal{
