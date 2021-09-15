@@ -69,7 +69,7 @@ func (tl *TokenLockInternal) GenerateUniqueID(store prefix.Store) {
 	tl.ID = hash
 }
 
-// Save saves the updated TokenLock node to the DB automatically according to it's ID
+// Save saves the updated TokenLock node to the DB automatically according to its ID
 func (tl TokenLockInternal) Save(store prefix.Store, cdc codec.Marshaler) {
 	if len(tl.ID) == 0 {
 		panic("no ID specified!")
@@ -78,6 +78,15 @@ func (tl TokenLockInternal) Save(store prefix.Store, cdc codec.Marshaler) {
 
 	bz := cdc.MustMarshalBinaryBare(&tl)
 	store.Set(WithPrefix(tl.ID), bz)
+}
+
+// TokenLockLoadIfExists is the same as TokenLockLoad, however it first checks for the existence of the token lock,
+// before getting it. Useful when there is a chance that a given lock doesn't exist.
+func TokenLockLoadIfExists(store prefix.Store, cdc codec.Marshaler, id string) (TokenLockInternal, bool) {
+	if !store.Has(WithPrefix(id)) {
+		return TokenLockInternal{}, false
+	}
+	return TokenLockLoad(store, cdc, id), true
 }
 
 // TokenLockLoad fetches a tokenlock from the db by the id

@@ -15,7 +15,12 @@ func (k msgServer) RemoveTokenLock(goCtx context.Context, msg *types.MsgRemoveTo
 	// create new store from sdk context
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.WithPrefix(""))
 
-	tokenLock := types.TokenLockLoad(store, k.cdc, msg.Id)
+	tokenLock, exists := types.TokenLockLoadIfExists(store, k.cdc, msg.Id)
+
+	// verify token lock's existence
+	if !exists {
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "The token lock doesn't exist")
+	}
 
 	// verify that the sender address is correct
 	if !(tokenLock.Creator == msg.Creator) {
