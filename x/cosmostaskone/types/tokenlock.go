@@ -53,7 +53,7 @@ func (tl TokenLockInternal) Next(store prefix.Store, cdc codec.Marshaler) TokenL
 func (tl *TokenLockInternal) GenerateUniqueID(store prefix.Store) {
 	hash := ""
 
-	for unique := false; unique != true; unique = store.Has(WithPrefix(hash)) {
+	for unique := false; unique != true; unique = !store.Has(WithPrefix(hash)) {
 		hash = ""
 
 		for i := 0; i < 32; i++ {
