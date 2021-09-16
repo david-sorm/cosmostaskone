@@ -37,3 +37,14 @@ func (cr CoinsRaw) ParseCoins() ([]*cosmosTypes.Coin, error) {
 
 	return coins, nil
 }
+
+func DereferenceCoinSlice(toDereference []*cosmosTypes.Coin) []cosmosTypes.Coin {
+	var dereferenced cosmosTypes.Coins = make([]cosmosTypes.Coin, 0, len(toDereference))
+	for _, v := range toDereference {
+		dereferenced = append(dereferenced, cosmosTypes.Coin{
+			Denom:  v.Denom,
+			Amount: v.Amount,
+		})
+	}
+	return dereferenced
+}
