@@ -44,9 +44,7 @@ func (tl TokenLockInternal) Next(store prefix.Store, cdc codec.Marshaler) TokenL
 	if len(tl.NextNode) == 0 {
 		return tl
 	}
-	res := store.Get(WithPrefix(tl.NextNode))
-	cdc.MustUnmarshalBinaryBare(res, &tl)
-	return tl
+	return TokenLockLoad(store, cdc, tl.NextNode)
 }
 
 // GenerateUniqueID generates a unique id for a tokenlock and ensures it is actually not used already
