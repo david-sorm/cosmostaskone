@@ -32,8 +32,16 @@ func (k msgServer) AddTokensLock(goCtx context.Context, msg *types.MsgAddTokensL
 		}
 	}
 
-	// TODO steal the tokens
+	// convert []*cosmosTypes.Coin to []cosmosTypes.Coin
+	coins := types.DereferenceCoinSlice(msg.Balances)
 
+	// TODO use Module Accounts
+	err = k.bankKeeper.SubtractCoins(ctx, address, coins)
+	if err != nil {
+		return nil, err
+	}
+
+	// update the data structures
 	lastNode := types.TokenLockStartNode(store, k.cdc).Last(store, k.cdc)
 
 	currentNode := types.TokenLockInternal{

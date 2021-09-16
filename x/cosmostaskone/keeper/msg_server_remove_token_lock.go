@@ -34,8 +34,17 @@ func (k msgServer) RemoveTokenLock(goCtx context.Context, msg *types.MsgRemoveTo
 
 	tokenLock.Disabled = true
 	tokenLock.Save(store, k.cdc)
+	address, err := sdk.AccAddressFromBech32(tokenLock.Creator)
+	if err != nil {
+		return nil, err
+	}
+	coins := types.DereferenceCoinSlice(tokenLock.Balances)
 
-	// TODO: mint and burn coins according to the token lock
+	// TODO use Module Accounts
+	err = k.bankKeeper.AddCoins(ctx, address, coins)
+	if err != nil {
+		return nil, err
+	}
 
 	return &types.MsgRemoveTokenLockResponse{}, nil
 }
