@@ -7,7 +7,13 @@ import (
 	"strconv"
 )
 
-const keyPrefix = "TokenLock-"
+const keyPrefix = "TL-"
+
+var hashDict = []rune{
+	'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
+	'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+}
 
 func WithPrefix(str string) []byte {
 	return []byte(keyPrefix + str)
@@ -67,6 +73,70 @@ func (tl *TokenLockInternal) GenerateUniqueID(store prefix.Store) {
 	}
 
 	tl.ID = hash
+}
+
+// GenerateKeyForTokenLock generates key in this format: {Global Prefix-}{Creator in Bech32}-{Shortest Unique Hash}
+// Requires TokenLockInternal.Creator to be correctly filled out with Creator's Bech32 address
+func (tl *TokenLockInternal) GenerateKeyForTokenLock(store store.KVStore) {
+	newHash := ""
+
+	// check if we already made an id for creatpr or not
+	// ({Global Prefix-}{Creator in Bech32} contains currently highest assigned hash to a specific creator)
+	if !store.Has(WithPrefix(tl.Creator)) {
+		newHash = string(hashDict[0])
+	} else {
+		bz := store.Get(WithPrefix(tl.Creator))
+		lastHash := string(bz)
+		runeInput := []rune(lastHash)
+
+		// prepend '@' to the beginning, so the hash has space to not overflow
+		runeInput = append([]rune("@"), runeInput...)
+
+		nextCharacterInSet(runeInput, hashDict)
+
+		// check if '@' is still present and if it is, delete it
+		if runeInput[0] == '@' {
+			runeInput = runeInput[1:]
+		}
+		newHash = string(runeInput)
+	}
+
+	// save the new hash for future use
+	store.Set(WithPrefix(tl.Creator), []byte(newHash))
+	newHash = string(WithPrefix(tl.Creator+"-")) + newHash
+	tl.ID = newHash
+}
+
+func nextCharacterInSet(input []rune, set []rune) []rune {
+	endOfSetRune := set[len(set)-1]
+	inputIndex := len(input) - 1
+
+	currentRune := func() rune {
+		return input[inputIndex]
+	}
+
+	findRuneInSet := func(r rune) int {
+		for index, value := range set {
+			if r == value {
+				return index
+			}
+		}
+		return -1
+	}
+	for {
+		if currentRune() != endOfSetRune {
+			indexInSet := findRuneInSet(currentRune())
+			input[inputIndex] = set[indexInSet+1]
+			return input
+		} else {
+			input[inputIndex] = set[0]
+			inputIndex--
+			if inputIndex == -1 {
+				return nil
+			}
+			continue
+		}
+	}
 }
 
 // Save saves the updated TokenLock node to the DB automatically according to its ID
