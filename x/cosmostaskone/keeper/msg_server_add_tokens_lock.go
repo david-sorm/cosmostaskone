@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"github.com/cosmos/cosmos-sdk/store/prefix"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -13,15 +12,15 @@ func (k msgServer) AddTokensLock(goCtx context.Context, msg *types.MsgAddTokensL
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// create new store from sdk context
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.WithPrefix(""))
+	store := ctx.KVStore(k.storeKey)
 
 	// check if the account has the balance specified
-	address, err := cosmosTypes.AccAddressFromBech32(msg.Creator)
+	creatorAddress, err := cosmosTypes.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return nil, err
 	}
 	for _, v := range msg.Balances {
-		if !k.bankKeeper.HasBalance(ctx, address, *v) {
+		if !k.bankKeeper.HasBalance(ctx, creatorAddress, *v) {
 			return nil,
 				sdkerrors.Wrapf(
 					sdkerrors.ErrInsufficientFunds,
@@ -35,26 +34,19 @@ func (k msgServer) AddTokensLock(goCtx context.Context, msg *types.MsgAddTokensL
 	// convert []*cosmosTypes.Coin to []cosmosTypes.Coin
 	coins := types.DereferenceCoinSlice(msg.Balances)
 
-	// TODO use Module Accounts
-	err = k.bankKeeper.SubtractCoins(ctx, address, coins)
+	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, creatorAddress, types.ModuleName, coins)
+
 	if err != nil {
 		return nil, err
 	}
 
-	// update the data structures
-	lastNode := types.TokenLockStartNode(store, k.cdc).Last(store, k.cdc)
-
-	currentNode := types.TokenLockInternal{
-		ID:       "",
+	tokenLock := types.TokenLockInternal{
 		Creator:  msg.Creator,
 		Balances: msg.Balances,
-		NextNode: "",
+		Disabled: false,
 	}
-	currentNode.GenerateUniqueID(store)
-	lastNode.NextNode = currentNode.ID
+	tokenLock.GenerateKeyForTokenLock(store)
+	tokenLock.Save(store, k.cdc)
 
-	currentNode.Save(store, k.cdc)
-	lastNode.Save(store, k.cdc)
-
-	return &types.MsgAddTokensLockResponse{Id: currentNode.ID}, nil
+	return &types.MsgAddTokensLockResponse{}, nil
 }
