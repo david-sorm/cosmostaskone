@@ -15,16 +15,13 @@ message TokenLockInternal {
   string ID = 1;
 
   // address, from which the denoms were taken, and to which the denoms will be returned
+  // in Bech32
   string Creator = 2;
 
   // locked denoms
   repeated cosmos.base.v1beta1.Coin Balances = 3;
 
-  // key of the next TokenLock (ID excluding prefix)
-  // if len() == 0, there is no next TokenLock; this is the last one
-  string NextNode = 4;
-
   // by default false
   // only true if the token lock has been disabled by RemoveTokenLock
-  bool disabled = 5;
+  bool disabled = 4;
 }
