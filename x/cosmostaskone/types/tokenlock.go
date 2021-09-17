@@ -37,22 +37,6 @@ func TokenLockStartNode(store prefix.Store, cdc codec.Marshaler) TokenLockIntern
 	return tli
 }
 
-// Last returns the last available TokenLock node
-func (tl TokenLockInternal) Last(store prefix.Store, cdc codec.Marshaler) TokenLockInternal {
-	for len(tl.NextNode) != 0 {
-		tl = tl.Next(store, cdc)
-	}
-	return tl
-}
-
-// Next returns the following node after this node
-func (tl TokenLockInternal) Next(store prefix.Store, cdc codec.Marshaler) TokenLockInternal {
-	if len(tl.NextNode) == 0 {
-		return tl
-	}
-	return TokenLockLoad(store, cdc, tl.NextNode)
-}
-
 // GenerateUniqueID generates a unique id for a tokenlock and ensures it is actually not used already
 func (tl *TokenLockInternal) GenerateUniqueID(store prefix.Store) {
 	hash := ""
