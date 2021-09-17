@@ -2,18 +2,20 @@ package keeper
 
 import (
 	"context"
-	"github.com/cosmos/cosmos-sdk/store/prefix"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/dsorm/cosmostaskone/x/cosmostaskone/types"
+	"strings"
 )
 
 func (k msgServer) RemoveTokenLock(goCtx context.Context, msg *types.MsgRemoveTokenLock) (*types.MsgRemoveTokenLockResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// create new store from sdk context
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.WithPrefix(""))
+	store := ctx.KVStore(k.storeKey)
+
+	// make sure the ID doesn't have the prefix
+	msg.Id = strings.TrimPrefix(msg.Id, string(types.WithPrefix("")))
 
 	tokenLock, exists := types.TokenLockLoadIfExists(store, k.cdc, msg.Id)
 
@@ -34,14 +36,13 @@ func (k msgServer) RemoveTokenLock(goCtx context.Context, msg *types.MsgRemoveTo
 
 	tokenLock.Disabled = true
 	tokenLock.Save(store, k.cdc)
-	address, err := sdk.AccAddressFromBech32(tokenLock.Creator)
+	creatorAddress, err := sdk.AccAddressFromBech32(tokenLock.Creator)
 	if err != nil {
 		return nil, err
 	}
 	coins := types.DereferenceCoinSlice(tokenLock.Balances)
 
-	// TODO use Module Accounts
-	err = k.bankKeeper.AddCoins(ctx, address, coins)
+	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, creatorAddress, coins)
 	if err != nil {
 		return nil, err
 	}
