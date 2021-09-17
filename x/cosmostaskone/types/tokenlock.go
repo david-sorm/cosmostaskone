@@ -2,7 +2,7 @@ package types
 
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/store/prefix"
+	"github.com/cosmos/cosmos-sdk/store"
 	"math/rand"
 	"strconv"
 )
@@ -21,7 +21,7 @@ func WithPrefix(str string) []byte {
 
 // TokenLockStartNode returns the StartNode, a node used as a starting point for the linked list
 // if the StartNode doesn't exist, it gets created automatically
-func TokenLockStartNode(store prefix.Store, cdc codec.Marshaler) TokenLockInternal {
+func TokenLockStartNode(store store.KVStore, cdc codec.Marshaler) TokenLockInternal {
 	var tli TokenLockInternal
 
 	// if there is no startnode yet, create a new one
@@ -38,7 +38,7 @@ func TokenLockStartNode(store prefix.Store, cdc codec.Marshaler) TokenLockIntern
 }
 
 // GenerateUniqueID generates a unique id for a tokenlock and ensures it is actually not used already
-func (tl *TokenLockInternal) GenerateUniqueID(store prefix.Store) {
+func (tl *TokenLockInternal) GenerateUniqueID(store store.KVStore) {
 	hash := ""
 
 	for unique := false; unique != true; unique = !store.Has(WithPrefix(hash)) {
@@ -124,19 +124,19 @@ func nextCharacterInSet(input []rune, set []rune) []rune {
 }
 
 // Save saves the updated TokenLock node to the DB automatically according to its ID
-func (tl TokenLockInternal) Save(store prefix.Store, cdc codec.Marshaler) {
+func (tl TokenLockInternal) Save(store store.KVStore, cdc codec.Marshaler) {
 	if len(tl.ID) == 0 {
 		panic("no ID specified!")
 		return
 	}
 
 	bz := cdc.MustMarshalBinaryBare(&tl)
-	store.Set(WithPrefix(tl.ID), bz)
+	store.Set([]byte(tl.ID), bz)
 }
 
 // TokenLockLoadIfExists is the same as TokenLockLoad, however it first checks for the existence of the token lock,
 // before getting it. Useful when there is a chance that a given lock doesn't exist.
-func TokenLockLoadIfExists(store prefix.Store, cdc codec.Marshaler, id string) (TokenLockInternal, bool) {
+func TokenLockLoadIfExists(store store.KVStore, cdc codec.Marshaler, id string) (TokenLockInternal, bool) {
 	if !store.Has(WithPrefix(id)) {
 		return TokenLockInternal{}, false
 	}
@@ -144,7 +144,7 @@ func TokenLockLoadIfExists(store prefix.Store, cdc codec.Marshaler, id string) (
 }
 
 // TokenLockLoad fetches a tokenlock from the db by the id
-func TokenLockLoad(store prefix.Store, cdc codec.Marshaler, id string) TokenLockInternal {
+func TokenLockLoad(store store.KVStore, cdc codec.Marshaler, id string) TokenLockInternal {
 	tl := TokenLockInternal{}
 	bz := store.Get(WithPrefix(id))
 	cdc.MustUnmarshalBinaryBare(bz, &tl)
