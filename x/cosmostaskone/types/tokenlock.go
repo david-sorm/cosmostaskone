@@ -73,7 +73,7 @@ func (tl *TokenLockInternal) GenerateKeyForTokenLock(store store.KVStore) {
 	} else {
 		bz := store.Get(WithPrefix(tl.Creator))
 		lastHash := string(bz)
-		lastHash = "9"
+
 		runeInput := []rune(lastHash)
 
 		// prepend '@' to the beginning, so the hash has space to not overflow
