@@ -32,19 +32,10 @@ func (k msgServer) AddTokensLock(goCtx context.Context, msg *types.MsgAddTokensL
 	}
 
 	// convert []*cosmosTypes.Coin to []cosmosTypes.Coin
-	//coins := types.DereferenceCoinSlice(msg.Balances)
+	coinsUnsorted := types.DereferenceCoinSlice(msg.Balances)
+	coins := types.SortCoinsAlphabetically(coinsUnsorted)
 
-	// temporary workaround for problem that causes the transaction to fail when multiple coins are entered at once
-	tempCoins := make(cosmosTypes.Coins, 1, 1)
-	for _, v := range msg.Balances {
-		tempCoins[0] = *v
-		err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, creatorAddress, types.ModuleName, tempCoins)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	// err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, creatorAddress, types.ModuleName, cosmosTypes.Coins(coins))
+	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, creatorAddress, types.ModuleName, coins)
 
 	if err != nil {
 		return nil, err
